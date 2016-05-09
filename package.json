@@ -8,6 +8,7 @@
     "babelify": "^7.3.0",
     "react": "^15.0.2",
     "react-dom": "^15.0.2",
+    "react-router": "^2.4.0",
     "watchify": "^3.7.0"
   },
   "devDependencies": {},
