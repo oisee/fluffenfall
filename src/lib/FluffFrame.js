@@ -60,7 +60,7 @@ var FluffFrame = function() {
   this.e.p = 0;
   this.e.pa = false; //absolute?
   this.e.sh = 0; //shift (positive >>, negative <<)
-  this.e.f = 0;
+  this.e.f = 0x0f;
   this.e.fa = false; //absolute?
 
   this.n.s = n; //source

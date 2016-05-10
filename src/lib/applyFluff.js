@@ -20,8 +20,8 @@ var applyFluff = function(frames, f, opt) {
       if (opt.stop && afc >= frames.length){
         break;
       };
-      var nf = applyFluffFrame(frames, afc, ff, opt);
-      nfs.push(newFrame);
+      var nf = applyFluffFrame(frames, afc, ff);
+      nfs.push(nf);
       afc++;
       r--;
     } while (r > 0);
@@ -29,7 +29,7 @@ var applyFluff = function(frames, f, opt) {
   return nfs;
 };
 
-var applyFluffFrame = function(frames, i, ff, opt) {
+var applyFluffFrame = function(frames, i, ff) {
   //nf - new frame
   var nf = new ChipFrame();
 
@@ -76,11 +76,11 @@ var applyFluffFrame = function(frames, i, ff, opt) {
   return nf;
 };
 
+//fch - fluff  channel
+//tch - target channel
+// cf - source channel
 var tone2tone = function(frames, i, fch, tch) {
-  //fch - fluff  channel
-  //tch - target channel
-  // cf - source channel
-  var cf = frames[i + fch.o][fch.s]; //frame and source;
+  var cf = getFrame(frames, i + fch.o)[fch.s]; //frame and source;
   tch.p = fch.pa ? fch.p : cf.p + fch.p;
   tch.v = fch.va ? fch.v : cf.v + fch.v;
   tch.e = fch.ea ? fch.e : cf.e && fch.e;
@@ -90,10 +90,7 @@ var tone2tone = function(frames, i, fch, tch) {
   tch.p = applyShift(tch.p, fch.sh, 0x0fff);
 };
 var env2tone = function(frames, i, fch, tch) {
-  //fch - fluff  channel
-  //tch - target channel
-  // cf - source channel
-  var cf = frames[i + fch.o][fch.s]; //frame and source;
+  var cf = getFrame(frames, i + fch.o)[fch.s]; //frame and source;
   tch.p = fch.pa ? fch.p : (cf.p & 0x0fff) + fch.p;
   tch.v = 0;
   tch.e = fch.e;
@@ -103,10 +100,7 @@ var env2tone = function(frames, i, fch, tch) {
   tch.p = applyShift(tch.p, fch.sh, 0x0fff);
 };
 var noise2tone = function(frames, i, fch, tch) {
-  //fch - fluff  channel
-  //tch - target channel
-  // cf - source channel
-  var cf = frames[i + fch.o][fch.s]; //frame and source;
+  var cf = getFrame(frames, i + fch.o)[fch.s]; //frame and source;
   tch.p = fch.pa ? fch.p << 4 : ((cf.p << 4) & 0x0fff) + fch.p;
   tch.v = 0;
   tch.e = fch.e;
@@ -117,55 +111,37 @@ var noise2tone = function(frames, i, fch, tch) {
 };
 
 var tone2env = function(frames, i, fch, tch) {
-  //fch - fluff  channel
-  //tch - target channel
-  // cf - source channel
-  var cf = frames[i + fch.o][fch.s]; //frame and source;
+  var cf = getFrame(frames, i + fch.o)[fch.s]; //frame and source;
   tch.p = fch.pa ? fch.p : cf.p + fch.p;
-  tch.f = fch.fa ? fch.f : 0x0e && fch.f;
+  tch.f = fch.fa ? fch.f : 0x0e & fch.f;
 
   tch.p = applyShift(tch.p, fch.sh, 0xfffff);
 };
 var env2env = function(frames, i, fch, tch) {
-  //fch - fluff  channel
-  //tch - target channel
-  // cf - source channel
-  var cf = frames[i + fch.o][fch.s]; //frame and source;
+  var cf = getFrame(frames, i + fch.o)[fch.s]; //frame and source;
   tch.p = fch.pa ? fch.p : cf.p + fch.p;
-  tch.f = fch.fa ? fch.f : cf.f && fch.f;
+  tch.f = fch.fa ? fch.f : cf.f & fch.f;
 
   tch.p = applyShift(tch.p, fch.sh, 0xfffff);
 };
 var noise2env = function(frames, i, fch, tch) {
-  //fch - fluff  channel
-  //tch - target channel
-  // cf - source channel
-  var cf = frames[i + fch.o][fch.s]; //frame and source;
+  var cf = getFrame(frames, i + fch.o)[fch.s]; //frame and source;
   tch.p = fch.pa ? fch.p << 4 : ((cf.p << 4) & 0x0fff) + fch.p;
-  tch.f = fch.fa ? fch.f : 0x0e && fch.f;
+  tch.f = fch.fa ? fch.f : 0x0e & fch.f;
 
   tch.p = applyShift(tch.p, fch.sh, 0xfffff);
 };
 
 var tone2noise = function(frames, i, fch, tch) {
-  //fch - fluff  channel
-  //tch - target channel
-  // cf - source channel
-  var cf = frames[i + fch.o][fch.s]; //frame and source;
+  var cf = getFrame(frames, i + fch.o)[fch.s]; //frame and source;
   tch.p = fch.pa ? fch.p : (cf.p >> 7) + fch.p;
 };
 var env2noise = function(frames, i, fch, tch) {
-  //fch - fluff  channel
-  //tch - target channel
-  // cf - source channel
-  var cf = frames[i + fch.o][fch.s]; //frame and source;
+  var cf = getFrame(frames, i + fch.o)[fch.s]; //frame and source;
   tch.p = fch.pa ? fch.p : (cf.p >> 7) + fch.p;
 };
 var noise2noise = function(frames, i, fch, tch) {
-  //fch - fluff  channel
-  //tch - target channel
-  // cf - source channel
-  var cf = frames[i + fch.o][fch.s]; //frame and source;
+  var cf = getFrame(frames, i + fch.o)[fch.s]; //frame and source;
   tch.p = fch.pa ? fch.p : cf.p + fch.p;
 };
 
@@ -177,9 +153,16 @@ var applyShift=function(p,sh, mask){
   } else {
     return (p << -sh) & mask;
   }
+};
+var getFrame = function(frames, off){
+  if (off < 0){
+    return frames[0];
+  } else if (off >= frames.length) {
+    return frames[frames.length-1];
+  } else {
+    return frames[off];
+  }
 }
 
-module.exports = {
-  applyFluff: applyFluff,
-  applyFluffFrame: applyFluffFrame
-};
+
+module.exports = applyFluff;

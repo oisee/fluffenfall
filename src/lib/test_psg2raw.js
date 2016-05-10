@@ -6,6 +6,7 @@ var raw2chip = require("./raw2chip.js");
 var chip2raw = require("./chip2raw.js");
 
 var FluffFrame = require("./FluffFrame.js");
+var applyFluff = require("./applyFluff.js");
 
 var infile = "./take.js.psg";
 var outfile = infile + ".raw";
@@ -23,13 +24,18 @@ var frames = raw2chip(raw);
 var raw = chip2raw(frames);
 
 var f = new FluffFrame();
-f.repeat = 8000;
+f.repeat = 99999;
 var fluff = [f];
 var opt = {
-  stop: true;
+  stop: true
 };
 
 var newframes = applyFluff(frames,fluff, opt);
+
+var raw2 = chip2raw(newframes);
+wb(outfile+".fluffed.raw", raw2);
+var psg2 = raw2psg(raw2);
+wb(outfile+".fluffed.psg", psg2);
 
 //console.log(frames);
 
