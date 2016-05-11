@@ -1,11 +1,14 @@
+var ChipFrame = require("./ChipFrame.js");
+
 var a = "a";
 var b = "b";
 var c = "c";
 var e = "e";
 var n = "n";
+var N2P = 7; //noise to period shift
 var toneChannels = [a, b, c];
 
-var ChipFrame = require("./ChipFrame.js");
+var emptyChipFrame = new ChipFrame();
 
 var applyFluff = function(frames, f, opt) {
   //frames - array of ChipFrames
@@ -13,18 +16,25 @@ var applyFluff = function(frames, f, opt) {
   //options.stop when out of range
   var afc = 0; //absolute frame counter
   var nfs = [];
+  var off = getMinMaxOffsets(f);
   for (var i = 0; i < f.length; i++) {
     var ff = f[i];
-    var r = ff.repeat;
-    do {
-      if (opt.stop && afc >= frames.length){
+    for (var r = 0; r < ff.repeat; r++) {
+      if (opt.stop && afc >= frames.length) {
+        break;
+      } else if (opt.softStop && afc >= frames.length - off.min) {
         break;
       };
+      if (ff.skip) {
+        continue;
+      }
       var nf = applyFluffFrame(frames, afc, ff);
       nfs.push(nf);
+      if (ff.dup) {
+        nfs.push(nf);
+      }
       afc++;
-      r--;
-    } while (r > 0);
+    };
   };
   return nfs;
 };
@@ -73,6 +83,9 @@ var applyFluffFrame = function(frames, i, ff) {
     noise2noise(frames, i, ff.n, nf.n);
   }
 
+  applyGlobal(nf.a, ff.g);
+  applyGlobal(nf.b, ff.g);
+  applyGlobal(nf.c, ff.g);
   return nf;
 };
 
@@ -101,7 +114,7 @@ var env2tone = function(frames, i, fch, tch) {
 };
 var noise2tone = function(frames, i, fch, tch) {
   var cf = getFrame(frames, i + fch.o)[fch.s]; //frame and source;
-  tch.p = fch.pa ? fch.p << 4 : ((cf.p << 4) & 0x0fff) + fch.p;
+  tch.p = fch.pa ? fch.p << N2P : ((cf.p << N2P) & 0x0fff) + fch.p;
   tch.v = 0;
   tch.e = fch.e;
   tch.t = fch.t;
@@ -126,7 +139,7 @@ var env2env = function(frames, i, fch, tch) {
 };
 var noise2env = function(frames, i, fch, tch) {
   var cf = getFrame(frames, i + fch.o)[fch.s]; //frame and source;
-  tch.p = fch.pa ? fch.p << 4 : ((cf.p << 4) & 0x0fff) + fch.p;
+  tch.p = fch.pa ? fch.p << N2P : ((cf.p << N2P) & 0x0fff) + fch.p;
   tch.f = fch.fa ? fch.f : 0x0e & fch.f;
 
   tch.p = applyShift(tch.p, fch.sh, 0xfffff);
@@ -134,19 +147,19 @@ var noise2env = function(frames, i, fch, tch) {
 
 var tone2noise = function(frames, i, fch, tch) {
   var cf = getFrame(frames, i + fch.o)[fch.s]; //frame and source;
-  tch.p = fch.pa ? fch.p : (cf.p >> 7) + fch.p;
+  tch.p = fch.pa ? fch.p : (cf.p >> N2P) + fch.p;
 };
 var env2noise = function(frames, i, fch, tch) {
   var cf = getFrame(frames, i + fch.o)[fch.s]; //frame and source;
-  tch.p = fch.pa ? fch.p : (cf.p >> 7) + fch.p;
+  tch.p = fch.pa ? fch.p : (cf.p >> N2P) + fch.p;
 };
 var noise2noise = function(frames, i, fch, tch) {
   var cf = getFrame(frames, i + fch.o)[fch.s]; //frame and source;
   tch.p = fch.pa ? fch.p : cf.p + fch.p;
 };
 
-var applyShift=function(p,sh, mask){
-  if(sh == 0){
+var applyShift = function(p, sh, mask) {
+  if (sh == 0) {
     return (p) & mask;
   } else if (sh > 0) {
     return (p >> sh) & mask;
@@ -154,15 +167,49 @@ var applyShift=function(p,sh, mask){
     return (p << -sh) & mask;
   }
 };
-var getFrame = function(frames, off){
-  if (off < 0){
-    return frames[0];
+
+var applyGlobal = function(tch, gch) {
+  tch.e = gch.ea ? gch.e : tch.e && gch.e;
+  tch.t = gch.ta ? gch.t : tch.t && gch.t;
+  tch.n = gch.na ? gch.n : tch.n && gch.n;
+}
+
+var getFrame = function(frames, off) {
+  if (off < 0) {
+    return emptyChipFrame;
+    //return frames[0];
   } else if (off >= frames.length) {
-    return frames[frames.length-1];
+    return emptyChipFrame;
+    //return frames[frames.length - 1];
   } else {
     return frames[off];
   }
-}
+};
 
+var getMinMaxOffsets = function(f) {
+  //f - fluff
+  var off = {
+    min: 0,
+    max: 0
+  }
+  for (var i = 0; i < f.length; i++) {
+    var ff = f[i];
+    var max = getMax([ff.a.o, ff.b.o, ff.c.o, ff.e.o, ff.n.o]);
+    var min = getMin([ff.a.o, ff.b.o, ff.c.o, ff.e.o, ff.n.o]);
+    if (max > off.max) {
+      off.max = max;
+    }
+    if (min > off.min) {
+      off.min = min;
+    }
+  }
+  return off;
+};
+var getMax = function(a) {
+  return Math.max.apply(null, a);
+};
+var getMin = function(a) {
+  return Math.min.apply(null, a);
+};
 
 module.exports = applyFluff;

@@ -6,12 +6,22 @@ var n = "n";
 
 var FluffFrame = function() {
   this.repeat = 1;
+  this.skip = false;
+  this.dup = false;
+
   this.a = {}; //a channel
   this.b = {}; //b channel
   this.c = {}; //c channel
   this.e = {}; //envelope channel
   this.n = {}; //noise channel
   this.g = {}; //globals
+
+  this.g.t = true;
+  this.g.ta = false;
+  this.g.e = true;
+  this.g.ea = false;
+  this.g.n = true;
+  this.g.na = false;
 
   this.a.s = a; //source
   this.a.o = 0; //frameoffset
@@ -47,7 +57,7 @@ var FluffFrame = function() {
   this.c.pa = false; //absolute?
   this.c.sh = 0; //shift (positive >>, negative <<)
   this.c.v = 0;
-  this.c.pa = false; //absolute?
+  this.c.va = false; //absolute?
   this.c.e = true;
   this.c.ea = false;
   this.c.t = true;
@@ -60,7 +70,7 @@ var FluffFrame = function() {
   this.e.p = 0;
   this.e.pa = false; //absolute?
   this.e.sh = 0; //shift (positive >>, negative <<)
-  this.e.f = 0x0f;
+  this.e.f = 0xff;
   this.e.fa = false; //absolute?
 
   this.n.s = n; //source

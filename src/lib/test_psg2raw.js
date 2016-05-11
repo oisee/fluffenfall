@@ -27,7 +27,8 @@ var f = new FluffFrame();
 f.repeat = 99999;
 var fluff = [f];
 var opt = {
-  stop: true
+  stop: false,
+  softStop: true,
 };
 
 var newframes = applyFluff(frames,fluff, opt);
