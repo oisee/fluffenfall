@@ -103,7 +103,7 @@ var applyFluffFrame = function(frames, i, ff) {
 var tone2tone = function(frames, i, fch, tch) {
   var cf = getFrame(frames, i + fch.o)[fch.s]; //frame and source;
   tch.p = fch.pa ? fch.p : cf.p + fch.p;
-  tch.v = fch.va ? fch.v : cf.v + fch.v;
+  tch.v = fch.va ? fch.v : applyVolume(cf.v, fch.v);
   tch.e = fch.ea ? fch.e : cf.e && fch.e;
   tch.t = fch.ta ? fch.t : cf.t && fch.t;
   tch.n = fch.na ? fch.n : cf.n && fch.n;
@@ -165,6 +165,13 @@ var noise2noise = function(frames, i, fch, tch) {
   var cf = getFrame(frames, i + fch.o)[fch.s]; //frame and source;
   tch.p = fch.pa ? fch.p : cf.p + fch.p;
 };
+
+var applyVolume = function(cv, fv){
+  var nv = cv +fv;
+  nv = nv > 15 ? 15: nv;
+  nv = nv < 0 ? 0 : nv;
+  return nv;
+}
 
 var applyShift = function(p, sh, mask) {
   if (sh == 0) {
