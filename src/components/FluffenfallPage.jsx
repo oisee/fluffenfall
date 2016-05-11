@@ -35,8 +35,8 @@ var FluffenfallPage = React.createClass({
       <div className={panelStyle}>
         <div className="panel-heading">fluffenfall</div>
         <div className="panel-body">
-          <FileFormPSG ref="filePSG" ext=".psg" onUpdate={this.onUpdatePSG}/>
-          <FileFormFluff ref="fileFluff" ext=".json" onUpdate={this.onUpdateFluff}/>
+          <FileFormPSG ref="filePSG" ext=".psg|application/octet-stream" onUpdate={this.onUpdatePSG}/>
+          <FileFormFluff ref="fileFluff" ext=".json|application/json" onUpdate={this.onUpdateFluff}/>
           <ApplyFluff psg={psgData} fluffjson={fluffData} download={psgFilename+"."+fluffFilename+".fluffed.psg"}/>
         </div>
       </div>

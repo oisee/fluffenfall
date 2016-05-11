@@ -25291,8 +25291,8 @@ var FluffenfallPage = React.createClass({
       React.createElement(
         "div",
         { className: "panel-body" },
-        React.createElement(FileFormPSG, { ref: "filePSG", ext: ".psg", onUpdate: this.onUpdatePSG }),
-        React.createElement(FileFormFluff, { ref: "fileFluff", ext: ".json", onUpdate: this.onUpdateFluff }),
+        React.createElement(FileFormPSG, { ref: "filePSG", ext: ".psg|application/octet-stream", onUpdate: this.onUpdatePSG }),
+        React.createElement(FileFormFluff, { ref: "fileFluff", ext: ".json|application/json", onUpdate: this.onUpdateFluff }),
         React.createElement(ApplyFluff, { psg: psgData, fluffjson: fluffData, download: psgFilename + "." + fluffFilename + ".fluffed.psg" })
       )
     );
@@ -25738,9 +25738,9 @@ var psg2raw = function (psg) {
               //ay[13] = 0xff;
               ay[13] = ay[13] & 0x0f | 0x80;
             }
-            ay.map(function (r) {
-              raw.push(r);
-            });
+            for (var ii = 0; ii < ay.length; ii++) {
+              raw.push(ay[ii]);
+            }
             state = 'inidata';
             r13_changed = false;
             break;
@@ -25753,16 +25753,16 @@ var psg2raw = function (psg) {
         break;
       case 'multieoi':
         for (var f = 0; f < 4 * b; f++) {
-          ay.map(function (r) {
-            raw.push(r);
-          });
+          for (var ii = 0; ii < ay.length; ii++) {
+            raw.push(ay[ii]);
+          }
         }
         state = 'inidata';
         break;
       case 'eom':
-        ay.map(function (r) {
-          raw.push(r);
-        });
+        for (var ii = 0; ii < ay.length; ii++) {
+          raw.push(ay[ii]);
+        }
         break;
       case 'error':
         console.log(state);

@@ -33,9 +33,9 @@ var psg2raw = function(psg) {
               //ay[13] = 0xff;
               ay[13] = ay[13] & 0x0f | 0x80
             }
-            ay.map(function(r) {
-              raw.push(r);
-            });
+            for (var ii = 0; ii < ay.length; ii++) {
+              raw.push(ay[ii]);
+            }
             state = 'inidata';
             r13_changed = false;
             break;
@@ -48,16 +48,16 @@ var psg2raw = function(psg) {
         break;
       case 'multieoi':
         for (var f = 0; f < 4 * b; f++) {
-          ay.map(function(r) {
-            raw.push(r);
-          });
+          for (var ii = 0; ii < ay.length; ii++) {
+            raw.push(ay[ii]);
+          }
         }
         state = 'inidata'
         break;
       case 'eom':
-        ay.map(function(r) {
-          raw.push(r);
-        });
+        for (var ii = 0; ii < ay.length; ii++) {
+          raw.push(ay[ii]);
+        }
         break;
       case 'error':
         console.log(state);
