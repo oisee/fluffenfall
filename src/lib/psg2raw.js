@@ -30,7 +30,8 @@ var psg2raw = function(psg) {
             break;
           case 0xff:
             if (!r13_changed) {
-              ay[13] = 0xff;
+              //ay[13] = 0xff;
+              ay[13] = ay[13] & 0x0f | 0x80
             }
             ay.map(function(r) {
               raw.push(r);

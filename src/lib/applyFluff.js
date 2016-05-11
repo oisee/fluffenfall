@@ -12,24 +12,25 @@ var emptyChipFrame = new ChipFrame();
 
 var applyFluff = function(frames, fpats, opt) {
   //frames - array of ChipFrames
-  //f - array of FluffFrames
-  //options.stop when out of range
+  //fframes - array of FluffFrames
+  //options.stopOutOfFrames when out of range
+  //options.noSoftStop - when out of range
   var afc = 0; //absolute frame counter
   var nfs = [];
   var off = getMinMaxOffsetsPat(fpats);
   for (var i = 0; i < fpats.length; i++) {
     var fpat = fpats[i];
     for (var fpatRep = 0; fpatRep < fpat.repeat; fpatRep++) {
-      for (var ii = 0; ii < fpat.f.length; ii++) {
-        var ff = fpat.f[ii];
+      for (var ii = 0; ii < fpat.fframes.length; ii++) {
+        var ff = fpat.fframes[ii];
         for (var r = 0; r < ff.repeat; r++) {
-          if (opt.stop && afc >= frames.length) {
+          if (opt.stopOutOfFrames && afc >= frames.length) {
             break;
-          } else if (opt.softStop && afc >= frames.length - off.min) {
+          } else if (!opt.noSoftStop && afc >= frames.length - off.min) {
             break;
           };
           if (ff.skip) {
-            afc ++;
+            afc++;
             continue;
           }
           var nf = applyFluffFrame(frames, afc, ff);
@@ -42,6 +43,7 @@ var applyFluff = function(frames, fpats, opt) {
       };
     };
   };
+  applyFineR13(nfs);
   return nfs;
 };
 
@@ -180,6 +182,17 @@ var applyGlobal = function(tch, gch) {
   tch.n = gch.na ? gch.n : tch.n && gch.n;
 }
 
+var applyFineR13 = function(frames) {
+  //frames - array of ChipFrames;
+  for (var i = 0; i < frames.length - 1; i++) {
+    var cf = frames[i];
+    var nf = frames[i + 1];
+    if ((nf.e.f & 0x0f) != (cf.e.f & 0x0f)) {
+      nf.e.f = nf.e.f & 0x0f; //if r13 is changed, reset "didNotChanged" 7th bit
+    };
+  };
+};
+
 var getFrame = function(frames, off) {
   if (off < 0) {
     return emptyChipFrame;
@@ -192,7 +205,7 @@ var getFrame = function(frames, off) {
   }
 };
 
-var getMinMaxOffsetsPat = function (f) {
+var getMinMaxOffsetsPat = function(f) {
   var off = {
     min: 0,
     max: 0

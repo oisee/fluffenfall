@@ -12,7 +12,8 @@ var raw2psg = function(raw) {
   for (var i = 0; i < raw.length; i = i + RAW_REGS) {
     ay = raw.slice(i, i + PSG1_REGS);
     reg = 0;
-    if (ay[13] == 0xff) {
+    //if (ay[13] == 0xff) {
+    if ((ay[13] & 0x80) != 0) {
       for (var f = 0; f < PSG1_REGS - 1; f++) {
         psg.push(reg);
         psg.push(ay[f]);

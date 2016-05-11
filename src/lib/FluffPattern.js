@@ -1,6 +1,6 @@
 var FluffPattern = function() {
   this.repeat = 1;
-  this.f = []; // array of FluffFrames
+  this.fframes = []; // array of FluffFrames
   //return this;
 };
 
