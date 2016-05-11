@@ -25291,8 +25291,8 @@ var FluffenfallPage = React.createClass({
       React.createElement(
         "div",
         { className: "panel-body" },
-        React.createElement(FileFormPSG, { ref: "filePSG", ext: ".psg|application/octet-stream", onUpdate: this.onUpdatePSG }),
-        React.createElement(FileFormFluff, { ref: "fileFluff", ext: ".json|application/json", onUpdate: this.onUpdateFluff }),
+        React.createElement(FileFormPSG, { ref: "filePSG", ext: ".psg", onUpdate: this.onUpdatePSG }),
+        React.createElement(FileFormFluff, { ref: "fileFluff", ext: ".json", onUpdate: this.onUpdateFluff }),
         React.createElement(ApplyFluff, { psg: psgData, fluffjson: fluffData, download: psgFilename + "." + fluffFilename + ".fluffed.psg" })
       )
     );
