@@ -25035,7 +25035,7 @@ var Routes = React.createElement(
 
 module.exports = Routes;
 
-},{"./components/AboutPage.jsx":234,"./components/Base.jsx":235,"./components/EffectronPage.jsx":236,"./components/FluffenfallPage.jsx":237,"history":45,"react":230,"react-router":85}],234:[function(require,module,exports){
+},{"./components/AboutPage.jsx":234,"./components/Base.jsx":236,"./components/EffectronPage.jsx":237,"./components/FluffenfallPage.jsx":239,"history":45,"react":230,"react-router":85}],234:[function(require,module,exports){
 var React = require("react");
 
 var AboutPage = React.createClass({
@@ -25058,6 +25058,54 @@ var AboutPage = React.createClass({
 module.exports = AboutPage;
 
 },{"react":230}],235:[function(require,module,exports){
+var React = require("react");
+
+var str2arr = require("../lib/str2arr.js");
+var arr2str = require("../lib/arr2str.js");
+var psg2raw = require("../lib/psg2raw.js");
+var raw2psg = require("../lib/raw2psg.js");
+var raw2chip = require("../lib/raw2chip.js");
+var chip2raw = require("../lib/chip2raw.js");
+var applyFluff = require("../lib/applyFluff.js");
+
+var ApplyFluff = React.createClass({
+  displayName: "ApplyFluff",
+
+  render: function () {
+    if (!this.props.psg || !this.props.fluffjson) {
+      return null;
+    }
+    var psg = str2arr(this.props.psg);
+    var fluffjson = this.props.fluffjson;
+    var raw = psg2raw(psg);
+    var frames = raw2chip(raw);
+    var fluff = JSON.parse(fluffjson);
+
+    var opt = {
+      stopOutOfFrames: false,
+      noSoftStop: false
+    };
+
+    var newframes = applyFluff(frames, fluff, opt);
+
+    var newraw = chip2raw(newframes);
+    var newpsg = raw2psg(newraw);
+    var b64encoded = btoa(arr2str(newpsg));
+    var data_uri = "data:application/octet-stream;base64," + b64encoded;
+
+    return React.createElement(
+      "a",
+      { href: data_uri, download: this.props.download },
+      "download \"",
+      this.props.download,
+      "\""
+    );
+  }
+});
+
+module.exports = ApplyFluff;
+
+},{"../lib/applyFluff.js":241,"../lib/arr2str.js":242,"../lib/chip2raw.js":243,"../lib/psg2raw.js":245,"../lib/raw2chip.js":246,"../lib/raw2psg.js":247,"../lib/str2arr.js":248,"react":230}],236:[function(require,module,exports){
 var React = require("react");
 
 var Base = React.createClass({
@@ -25106,7 +25154,7 @@ var Base = React.createClass({
 
 module.exports = Base;
 
-},{"react":230}],236:[function(require,module,exports){
+},{"react":230}],237:[function(require,module,exports){
 var React = require("react");
 
 var EffectronPage = React.createClass({
@@ -25132,33 +25180,673 @@ var EffectronPage = React.createClass({
 
 module.exports = EffectronPage;
 
-},{"react":230}],237:[function(require,module,exports){
+},{"react":230}],238:[function(require,module,exports){
 var React = require("react");
+var FileFormPSG = React.createClass({
+  displayName: "FileFormPSG",
+
+  // since we are starting off without any data, there is no initial value
+  getInitialState: function () {
+    return {
+      data: null,
+      uploaded: false,
+      filename: "" };
+  },
+
+  // prevent form from submitting; we are going to capture the file contents
+  handleSubmit: function (e) {
+    e.preventDefault();
+  },
+
+  // when a file is passed to the input field, retrieve the contents as a
+  // base64-encoded data URI and save it to the component's state
+  handleUpload: function (upload) {
+    this.setState({ data: upload.target.result, uploaded: true });
+    this.props.onUpdate(true);
+  },
+
+  handleFile: function (e) {
+    var self = this;
+    var reader = new FileReader();
+    var file = e.target.files[0];
+    if (typeof file !== "undefined") {
+      reader.onload = this.handleUpload;
+      reader.readAsBinaryString(file);
+      self.setState({ filename: file.name });
+    } else {
+      self.setState({ data: null, uploaded: false, filename: "" });
+      this.props.onUpdate(false);
+    };
+  },
+  render: function () {
+    var panelStyle = this.state.uploaded ? "panel panel-success" : "panel panel-default";
+    return React.createElement(
+      "div",
+      { className: panelStyle },
+      React.createElement(
+        "div",
+        { className: "panel-heading" },
+        this.props.ext,
+        "file:"
+      ),
+      React.createElement(
+        "div",
+        { className: "panel-body" },
+        React.createElement(
+          "form",
+          { onSubmit: this.handleSubmit, encType: "multipart/form-data" },
+          React.createElement("input", { type: "file", onChange: this.handleFile, accept: this.props.ext })
+        )
+      )
+    );
+  }
+});
+
+module.exports = FileFormPSG;
+
+},{"react":230}],239:[function(require,module,exports){
+var React = require("react");
+var FileFormPSG = require("./FileForm.jsx");
+var FileFormFluff = require("./FileForm.jsx");
+var ApplyFluff = require(".//ApplyFluff.jsx");
 
 var FluffenfallPage = React.createClass({
   displayName: "FluffenfallPage",
 
+  getInitialState: function () {
+    return {
+      psg_uploaded: false,
+      fluff_uploaded: false,
+      button_enabled: false,
+      data_uri: ""
+    };
+  },
+  onUpdatePSG: function (val) {
+    this.setState({
+      psg_uploaded: val,
+      button_enabled: this.state.fluff_uploaded && val
+    });
+  },
+  onUpdateFluff: function (val) {
+    this.setState({
+      fluff_uploaded: val,
+      button_enabled: this.state.psg_uploaded && val
+    });
+  },
   render: function () {
+    var psgData = this.refs.filePSG ? this.refs.filePSG.state.data : false;
+    var fluffData = this.refs.filePSG ? this.refs.fileFluff.state.data : false;
+    var psgFilename = this.refs.filePSG ? this.refs.filePSG.state.filename : "";
+    var fluffFilename = this.refs.filePSG ? this.refs.fileFluff.state.filename : "";
+    var panelStyle = this.state.button_enabled ? "panel panel-success" : "panel panel-default";
+
     return React.createElement(
       "div",
-      { className: "panel panel-default" },
+      { className: panelStyle },
       React.createElement(
         "div",
         { className: "panel-heading" },
         "fluffenfall"
       ),
-      React.createElement("div", { className: "panel-body" })
+      React.createElement(
+        "div",
+        { className: "panel-body" },
+        React.createElement(FileFormPSG, { ref: "filePSG", ext: ".psg", onUpdate: this.onUpdatePSG }),
+        React.createElement(FileFormFluff, { ref: "fileFluff", ext: ".json", onUpdate: this.onUpdateFluff })
+      ),
+      React.createElement(ApplyFluff, { psg: psgData, fluffjson: fluffData, download: psgFilename + "." + fluffFilename + ".fluffed.psg" })
     );
   }
 });
 
 module.exports = FluffenfallPage;
 
-},{"react":230}],238:[function(require,module,exports){
+},{".//ApplyFluff.jsx":235,"./FileForm.jsx":238,"react":230}],240:[function(require,module,exports){
+var RAW_REGS = 16;
+
+var ChipFrame = function (ay) {
+  //ay is expected to be an array RAW_REGS length;
+  if (typeof ay == "undefined") {
+    ay = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+  }
+  this.a = {};
+  this.b = {};
+  this.c = {};
+  this.e = {};
+  this.n = {};
+  // periods
+  this.a.p = ay[0] + (ay[1] << 8) & 0x0fff;
+  this.b.p = ay[2] + (ay[3] << 8) & 0x0fff;
+  this.c.p = ay[4] + (ay[5] << 8) & 0x0fff;
+  this.e.p = (ay[11] + (ay[12] << 8) & 0xffff) << 4;
+  this.n.p = ay[6] & 0x1f;
+  //volumes & forms
+  this.a.v = ay[8] & 0x0f;
+  this.b.v = ay[9] & 0x0f;
+  this.c.v = ay[10] & 0x0f;
+  this.e.f = ay[13] & 0xff;
+
+  //mixer envelope
+  this.a.e = (ay[8] & 0x10) != 0;
+  this.b.e = (ay[9] & 0x10) != 0;
+  this.c.e = (ay[10] & 0x10) != 0;
+  //mixer tone
+  this.a.t = (ay[7] & 0b000001) != 0;
+  this.b.t = (ay[7] & 0b000010) != 0;
+  this.c.t = (ay[7] & 0b000100) != 0;
+  //mixer noise
+  this.a.n = (ay[7] & 0b001000) != 0;
+  this.b.n = (ay[7] & 0b010000) != 0;
+  this.c.n = (ay[7] & 0b100000) != 0;
+};
+
+ChipFrame.prototype.clone = function () {
+  var nf = {};
+  nf.a = {};
+  nf.b = {};
+  nf.c = {};
+  nf.e = {};
+  nf.n = {};
+
+  nf.a.p = this.a.p;
+  nf.b.p = this.b.p;
+  nf.c.p = this.c.p;
+  nf.e.p = this.e.p;
+  nf.n.p = this.n.p;
+
+  nf.a.v = this.a.v;
+  nf.b.v = this.b.v;
+  nf.c.v = this.c.v;
+  nf.e.f = this.e.f;
+
+  nf.a.e = this.a.e;
+  nf.b.e = this.b.e;
+  nf.c.e = this.c.e;
+  //mixer tone
+  nf.a.t = this.a.t;
+  nf.b.t = this.b.t;
+  nf.c.t = this.c.t;
+  //mixer noise
+  nf.a.n = this.a.n;
+  nf.b.n = this.b.n;
+  nf.c.n = this.c.n;
+  return nf;
+};
+
+module.exports = ChipFrame;
+
+},{}],241:[function(require,module,exports){
+var ChipFrame = require("./ChipFrame.js");
+
+var a = "a";
+var b = "b";
+var c = "c";
+var e = "e";
+var n = "n";
+var N2P = 7; //noise to period shift
+var toneChannels = [a, b, c];
+
+var emptyChipFrame = new ChipFrame();
+
+var applyFluff = function (frames, fpats, opt) {
+  //frames - array of ChipFrames
+  //fframes - array of FluffFrames
+  //options.stopOutOfFrames when out of range
+  //options.noSoftStop - when out of range
+  var afc = 0; //absolute frame counter
+  var nfs = [];
+  var off = getMinMaxOffsetsPat(fpats);
+  for (var i = 0; i < fpats.length; i++) {
+    var fpat = fpats[i];
+    for (var fpatRep = 0; fpatRep < fpat.repeat; fpatRep++) {
+      for (var ii = 0; ii < fpat.fframes.length; ii++) {
+        var ff = fpat.fframes[ii];
+        for (var r = 0; r < ff.repeat; r++) {
+          if (opt.stopOutOfFrames && afc >= frames.length) {
+            break;
+          } else if (!opt.noSoftStop && afc >= frames.length - off.min) {
+            break;
+          };
+          if (ff.skip) {
+            afc++;
+            continue;
+          }
+          var nf = applyFluffFrame(frames, afc, ff);
+          nfs.push(nf);
+          if (ff.dup) {
+            nfs.push(nf);
+          }
+          afc++;
+        };
+      };
+    };
+  };
+  applyFineR13(nfs);
+  return nfs;
+};
+
+var applyFluffFrame = function (frames, i, ff) {
+  //nf - new frame
+  var nf = new ChipFrame();
+
+  if (toneChannels.indexOf(ff.a.s) >= 0) {
+    tone2tone(frames, i, ff.a, nf.a);
+  } else if (ff.a.s == e) {
+    env2tone(frames, i, ff.a, nf.a);
+  } else if (ff.a.s == n) {
+    noise2tone(frames, i, ff.a, nf.a);
+  }
+
+  if (toneChannels.indexOf(ff.b.s) >= 0) {
+    tone2tone(frames, i, ff.b, nf.b);
+  } else if (ff.b.s == e) {
+    env2tone(frames, i, ff.b, nf.b);
+  } else if (ff.b.s == n) {
+    noise2tone(frames, i, ff.b, nf.b);
+  }
+
+  if (toneChannels.indexOf(ff.c.s) >= 0) {
+    tone2tone(frames, i, ff.c, nf.c);
+  } else if (ff.c.s == e) {
+    env2tone(frames, i, ff.c, nf.c);
+  } else if (ff.c.s == n) {
+    noise2tone(frames, i, ff.c, nf.c);
+  }
+
+  if (toneChannels.indexOf(ff.e.s) >= 0) {
+    tone2env(frames, i, ff.e, nf.e);
+  } else if (ff.e.s == e) {
+    env2env(frames, i, ff.e, nf.e);
+  } else if (ff.e.s == n) {
+    noise2env(frames, i, ff.e, nf.e);
+  }
+
+  if (toneChannels.indexOf(ff.n.s) >= 0) {
+    tone2noise(frames, i, ff.n, nf.n);
+  } else if (ff.n.s == e) {
+    env2noise(frames, i, ff.n, nf.n);
+  } else if (ff.n.s == n) {
+    noise2noise(frames, i, ff.n, nf.n);
+  }
+
+  applyGlobal(nf.a, ff.g);
+  applyGlobal(nf.b, ff.g);
+  applyGlobal(nf.c, ff.g);
+  return nf;
+};
+
+//fch - fluff  channel
+//tch - target channel
+// cf - source channel
+var tone2tone = function (frames, i, fch, tch) {
+  var cf = getFrame(frames, i + fch.o)[fch.s]; //frame and source;
+  tch.p = fch.pa ? fch.p : cf.p + fch.p;
+  tch.v = fch.va ? fch.v : applyVolume(cf.v, fch.v);
+  tch.e = fch.ea ? fch.e : cf.e && fch.e;
+  tch.t = fch.ta ? fch.t : cf.t && fch.t;
+  tch.n = fch.na ? fch.n : cf.n && fch.n;
+
+  tch.p = applyShift(tch.p, fch.sh, 0x0fff);
+};
+var env2tone = function (frames, i, fch, tch) {
+  var cf = getFrame(frames, i + fch.o)[fch.s]; //frame and source;
+  tch.p = fch.pa ? fch.p : (cf.p & 0x0fff) + fch.p;
+  tch.v = 0;
+  tch.e = fch.e;
+  tch.t = fch.t;
+  tch.n = fch.n;
+
+  tch.p = applyShift(tch.p, fch.sh, 0x0fff);
+};
+var noise2tone = function (frames, i, fch, tch) {
+  var cf = getFrame(frames, i + fch.o)[fch.s]; //frame and source;
+  tch.p = fch.pa ? fch.p << N2P : (cf.p << N2P & 0x0fff) + fch.p;
+  tch.v = 0;
+  tch.e = fch.e;
+  tch.t = fch.t;
+  tch.n = fch.n;
+
+  tch.p = applyShift(tch.p, fch.sh, 0x0fff);
+};
+
+var tone2env = function (frames, i, fch, tch) {
+  var cf = getFrame(frames, i + fch.o)[fch.s]; //frame and source;
+  tch.p = fch.pa ? fch.p : cf.p + fch.p;
+  tch.f = fch.fa ? fch.f : 0x0e & fch.f;
+
+  tch.p = applyShift(tch.p, fch.sh, 0xfffff);
+};
+var env2env = function (frames, i, fch, tch) {
+  var cf = getFrame(frames, i + fch.o)[fch.s]; //frame and source;
+  tch.p = fch.pa ? fch.p : cf.p + fch.p;
+  tch.f = fch.fa ? fch.f : cf.f & fch.f;
+
+  tch.p = applyShift(tch.p, fch.sh, 0xfffff);
+};
+var noise2env = function (frames, i, fch, tch) {
+  var cf = getFrame(frames, i + fch.o)[fch.s]; //frame and source;
+  tch.p = fch.pa ? fch.p << N2P : (cf.p << N2P & 0x0fff) + fch.p;
+  tch.f = fch.fa ? fch.f : 0x0e & fch.f;
+
+  tch.p = applyShift(tch.p, fch.sh, 0xfffff);
+};
+
+var tone2noise = function (frames, i, fch, tch) {
+  var cf = getFrame(frames, i + fch.o)[fch.s]; //frame and source;
+  tch.p = fch.pa ? fch.p : (cf.p >> N2P) + fch.p;
+};
+var env2noise = function (frames, i, fch, tch) {
+  var cf = getFrame(frames, i + fch.o)[fch.s]; //frame and source;
+  tch.p = fch.pa ? fch.p : (cf.p >> N2P) + fch.p;
+};
+var noise2noise = function (frames, i, fch, tch) {
+  var cf = getFrame(frames, i + fch.o)[fch.s]; //frame and source;
+  tch.p = fch.pa ? fch.p : cf.p + fch.p;
+};
+
+var applyVolume = function (cv, fv) {
+  var nv = cv + fv;
+  nv = nv > 15 ? 15 : nv;
+  nv = nv < 0 ? 0 : nv;
+  return nv;
+};
+
+var applyShift = function (p, sh, mask) {
+  if (sh == 0) {
+    return p & mask;
+  } else if (sh > 0) {
+    return p >> sh & mask;
+  } else {
+    return p << -sh & mask;
+  }
+};
+
+var applyGlobal = function (tch, gch) {
+  tch.e = gch.ea ? gch.e : tch.e && gch.e;
+  tch.t = gch.ta ? gch.t : tch.t && gch.t;
+  tch.n = gch.na ? gch.n : tch.n && gch.n;
+};
+
+var applyFineR13 = function (frames) {
+  //frames - array of ChipFrames;
+  for (var i = 0; i < frames.length - 1; i++) {
+    var cf = frames[i];
+    var nf = frames[i + 1];
+    if ((nf.e.f & 0x0f) != (cf.e.f & 0x0f)) {
+      nf.e.f = nf.e.f & 0x0f; //if r13 is changed, reset "didNotChanged" 7th bit
+    };
+  };
+};
+
+var getFrame = function (frames, off) {
+  if (off < 0) {
+    return emptyChipFrame;
+    //return frames[0];
+  } else if (off >= frames.length) {
+      return emptyChipFrame;
+      //return frames[frames.length - 1];
+    } else {
+        return frames[off];
+      }
+};
+
+var getMinMaxOffsetsPat = function (f) {
+  var off = {
+    min: 0,
+    max: 0
+  };
+  for (var i = 0; i < f.length; i++) {
+    var ff = f[i];
+    var noff = getMinMaxOffsets(ff);
+    if (noff.max > off.max) {
+      off.max = noff.max;
+    }
+    if (noff.min > off.min) {
+      off.min = noff.min;
+    }
+  }
+  return off;
+};
+
+var getMinMaxOffsets = function (f) {
+  //f - fluff
+  var off = {
+    min: 0,
+    max: 0
+  };
+  for (var i = 0; i < f.length; i++) {
+    var ff = f[i];
+    var max = getMax([ff.a.o, ff.b.o, ff.c.o, ff.e.o, ff.n.o]);
+    var min = getMin([ff.a.o, ff.b.o, ff.c.o, ff.e.o, ff.n.o]);
+    if (max > off.max) {
+      off.max = max;
+    }
+    if (min > off.min) {
+      off.min = min;
+    }
+  }
+  return off;
+};
+var getMax = function (a) {
+  return Math.max.apply(null, a);
+};
+var getMin = function (a) {
+  return Math.min.apply(null, a);
+};
+
+module.exports = applyFluff;
+
+},{"./ChipFrame.js":240}],242:[function(require,module,exports){
+var arr2str = function (arr) {
+  var str = "";
+  for (var i = 0; i < arr.length; i++) {
+    str += String.fromCharCode(arr[i]);
+  };
+  return str;
+};
+
+module.exports = arr2str;
+
+},{}],243:[function(require,module,exports){
+var chipFrame2ay = require("./chipFrame2ay.js");
+var RAW_REGS = 16;
+var chip2raw = function (frames) {
+  // raw - expected to be array RAW_REGS*n length;
+  var raw = [];
+  for (var i = 0; i < frames.length; i++) {
+    var ay = chipFrame2ay(frames[i]);
+    for (var f = 0; f < ay.length; f++) {
+      raw.push(ay[f]);
+    };
+  };
+  return raw;
+};
+module.exports = chip2raw;
+
+},{"./chipFrame2ay.js":244}],244:[function(require,module,exports){
+var RAW_REGS = 16;
+
+var chipFrame2ay = function (f) {
+  //f is expected to be an ChipFrame instance
+  var ay = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+  // periods
+  ay[0] = f.a.p & 0xff;
+  ay[1] = f.a.p >> 8 & 0x0f;
+  ay[2] = f.b.p & 0xff;
+  ay[3] = f.b.p >> 8 & 0x0f;
+  ay[4] = f.c.p & 0xff;
+  ay[5] = f.c.p >> 8 & 0x0f;
+
+  ay[6] = f.n.p & 0x1f;
+  ay[11] = f.e.p >> 4 & 0xff;
+  ay[12] = f.e.p >> 12 & 0xff;
+
+  //volumes & envelope mask & envelope form
+  ay[8] = f.a.e ? f.a.v & 0x0f | 0x10 : f.a.v & 0x0f;
+  ay[9] = f.b.e ? f.b.v & 0x0f | 0x10 : f.b.v & 0x0f;
+  ay[10] = f.c.e ? f.c.v & 0x0f | 0x10 : f.c.v & 0x0f;
+  ay[13] = f.e.f & 0xff;
+
+  //mixer tone
+  ay[7] = f.a.t ? ay[7] | 0b000001 : ay[7];
+  ay[7] = f.b.t ? ay[7] | 0b000010 : ay[7];
+  ay[7] = f.c.t ? ay[7] | 0b000100 : ay[7];
+
+  //mixer noise
+  ay[7] = f.a.n ? ay[7] | 0b001000 : ay[7];
+  ay[7] = f.b.n ? ay[7] | 0b010000 : ay[7];
+  ay[7] = f.c.n ? ay[7] | 0b100000 : ay[7];
+  return ay;
+};
+
+module.exports = chipFrame2ay;
+
+},{}],245:[function(require,module,exports){
+var RAW_REGS = 16;
+
+var psg2raw = function (psg) {
+  var raw = [];
+  if (psg.length < 5) {
+    return raw;
+  }
+  var reg = 0;
+  var ay = new Uint8Array(RAW_REGS);
+  var state = 'inidata';
+  var r13_changed = false;
+  for (var i = 4; i < psg.length; i++) {
+    var b = psg[i];
+    switch (state) {
+      case 'inidata':
+        switch (b) {
+          case b >= 0x00 && b <= 0x0d ? b : null:
+            reg = b;
+            state = 'regdata';
+            if (b == 13) {
+              r13_changed = true;
+            }
+            break;
+          case 0xfd:
+            state = 'eom';
+            break;
+          case 0xfe:
+            state = 'multieoi';
+            r13_changed = false;
+            break;
+          case 0xff:
+            if (!r13_changed) {
+              //ay[13] = 0xff;
+              ay[13] = ay[13] & 0x0f | 0x80;
+            }
+            ay.map(function (r) {
+              raw.push(r);
+            });
+            state = 'inidata';
+            r13_changed = false;
+            break;
+          default:
+        }
+        break;
+      case 'regdata':
+        ay[reg] = b;
+        state = 'inidata';
+        break;
+      case 'multieoi':
+        for (var f = 0; f < 4 * b; f++) {
+          ay.map(function (r) {
+            raw.push(r);
+          });
+        }
+        state = 'inidata';
+        break;
+      case 'eom':
+        ay.map(function (r) {
+          raw.push(r);
+        });
+        break;
+      case 'error':
+        console.log(state);
+        break;
+      default:
+        console.log(state);
+    }
+  }
+  return raw;
+};
+
+module.exports = psg2raw;
+
+},{}],246:[function(require,module,exports){
+var ChipFrame = require("./ChipFrame.js");
+
+var RAW_REGS = 16;
+
+var raw2chip = function (raw) {
+  // raw - expected to be array RAW_REGS*n length;
+  var frames = [];
+  for (var i = 0; i < raw.length; i = i + RAW_REGS) {
+    var ay = raw.slice(i, i + RAW_REGS);
+    var chipFrame = new ChipFrame(ay);
+    frames.push(chipFrame);
+  };
+  return frames;
+};
+
+module.exports = raw2chip;
+
+},{"./ChipFrame.js":240}],247:[function(require,module,exports){
+var PSG1_ID = "PSG\x1A";
+var PSG1_REGS = 14;
+var RAW_REGS = 16;
+
+var raw2psg = function (raw) {
+  var psg = [];
+  var ay = new Uint8Array(RAW_REGS);
+
+  for (var i = 0; i < PSG1_ID.length; i++) {
+    psg.push(PSG1_ID.charCodeAt(i));
+  };
+  for (var i = 0; i < raw.length; i = i + RAW_REGS) {
+    ay = raw.slice(i, i + PSG1_REGS);
+    reg = 0;
+    //if (ay[13] == 0xff) {
+    if ((ay[13] & 0x80) != 0) {
+      for (var f = 0; f < PSG1_REGS - 1; f++) {
+        psg.push(reg);
+        psg.push(ay[f]);
+        reg++;
+      };
+    } else {
+      for (var f = 0; f < PSG1_REGS; f++) {
+        psg.push(reg);
+        psg.push(ay[f]);
+        reg++;
+      };
+    };
+    psg.push(0xff); //new frame
+  }
+  psg.push(0xfd); //end of music
+  return psg;
+};
+
+module.exports = raw2psg;
+
+},{}],248:[function(require,module,exports){
+var str2arr = function (str) {
+  var arr = new Uint8Array(str.length);
+  for (var i = 0; i < str.length; i++) {
+    arr[i] = str.charCodeAt(i);
+  }
+  return arr;
+};
+
+module.exports = str2arr;
+
+},{}],249:[function(require,module,exports){
 var React = require('react');
 var ReactDOM = require('react-dom');
 var Routes = require('./Routes.jsx');
 
 ReactDOM.render(Routes, document.getElementById('main'));
 
-},{"./Routes.jsx":233,"react":230,"react-dom":55}]},{},[238]);
+},{"./Routes.jsx":233,"react":230,"react-dom":55}]},{},[249]);
