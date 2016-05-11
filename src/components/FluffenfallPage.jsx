@@ -37,12 +37,8 @@ var FluffenfallPage = React.createClass({
         <div className="panel-body">
           <FileFormPSG ref="filePSG" ext=".psg" onUpdate={this.onUpdatePSG}/>
           <FileFormFluff ref="fileFluff" ext=".json" onUpdate={this.onUpdateFluff}/>
-          {/*<button onClick={this.onApply} className="btn btn-success" disabled={!this.state.button_enabled}>apply .fluff to .psg</button>*/}
+          <ApplyFluff psg={psgData} fluffjson={fluffData} download={psgFilename+"."+fluffFilename+".fluffed.psg"}/>
         </div>
-        {/*<a href={this.state.data_uri} download={downloadFile+".fluffed.psg"} >Download file</a>*/}
-
-        <ApplyFluff psg={psgData} fluffjson={fluffData} download={psgFilename+"."+fluffFilename+".fluffed.psg"}/>
-
       </div>
     )
   }

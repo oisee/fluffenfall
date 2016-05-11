@@ -25095,7 +25095,7 @@ var ApplyFluff = React.createClass({
 
     return React.createElement(
       "a",
-      { href: data_uri, download: this.props.download },
+      { className: "btn btn-success col-xs-12 col-sm-12 col-md-8 col-md-offset-2", href: data_uri, download: this.props.download },
       "download \"",
       this.props.download,
       "\""
@@ -25292,9 +25292,9 @@ var FluffenfallPage = React.createClass({
         "div",
         { className: "panel-body" },
         React.createElement(FileFormPSG, { ref: "filePSG", ext: ".psg", onUpdate: this.onUpdatePSG }),
-        React.createElement(FileFormFluff, { ref: "fileFluff", ext: ".json", onUpdate: this.onUpdateFluff })
-      ),
-      React.createElement(ApplyFluff, { psg: psgData, fluffjson: fluffData, download: psgFilename + "." + fluffFilename + ".fluffed.psg" })
+        React.createElement(FileFormFluff, { ref: "fileFluff", ext: ".json", onUpdate: this.onUpdateFluff }),
+        React.createElement(ApplyFluff, { psg: psgData, fluffjson: fluffData, download: psgFilename + "." + fluffFilename + ".fluffed.psg" })
+      )
     );
   }
 });

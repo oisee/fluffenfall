@@ -32,7 +32,7 @@ var ApplyFluff = React.createClass({
     var data_uri = "data:application/octet-stream;base64," + b64encoded;
 
     return (
-      <a href={data_uri} download={this.props.download}>download "{this.props.download}"</a>
+      <a className="btn btn-success col-xs-12 col-sm-12 col-md-8 col-md-offset-2" href={data_uri} download={this.props.download}>download "{this.props.download}"</a>
     );
   }
 });
