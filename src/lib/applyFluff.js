@@ -10,30 +10,36 @@ var toneChannels = [a, b, c];
 
 var emptyChipFrame = new ChipFrame();
 
-var applyFluff = function(frames, f, opt) {
+var applyFluff = function(frames, fpats, opt) {
   //frames - array of ChipFrames
   //f - array of FluffFrames
   //options.stop when out of range
   var afc = 0; //absolute frame counter
   var nfs = [];
-  var off = getMinMaxOffsets(f);
-  for (var i = 0; i < f.length; i++) {
-    var ff = f[i];
-    for (var r = 0; r < ff.repeat; r++) {
-      if (opt.stop && afc >= frames.length) {
-        break;
-      } else if (opt.softStop && afc >= frames.length - off.min) {
-        break;
+  var off = getMinMaxOffsetsPat(fpats);
+  for (var i = 0; i < fpats.length; i++) {
+    var fpat = fpats[i];
+    for (var fpatRep = 0; fpatRep < fpat.repeat; fpatRep++) {
+      for (var ii = 0; ii < fpat.f.length; ii++) {
+        var ff = fpat.f[ii];
+        for (var r = 0; r < ff.repeat; r++) {
+          if (opt.stop && afc >= frames.length) {
+            break;
+          } else if (opt.softStop && afc >= frames.length - off.min) {
+            break;
+          };
+          if (ff.skip) {
+            afc ++;
+            continue;
+          }
+          var nf = applyFluffFrame(frames, afc, ff);
+          nfs.push(nf);
+          if (ff.dup) {
+            nfs.push(nf);
+          }
+          afc++;
+        };
       };
-      if (ff.skip) {
-        continue;
-      }
-      var nf = applyFluffFrame(frames, afc, ff);
-      nfs.push(nf);
-      if (ff.dup) {
-        nfs.push(nf);
-      }
-      afc++;
     };
   };
   return nfs;
@@ -185,6 +191,24 @@ var getFrame = function(frames, off) {
     return frames[off];
   }
 };
+
+var getMinMaxOffsetsPat = function (f) {
+  var off = {
+    min: 0,
+    max: 0
+  }
+  for (var i = 0; i < f.length; i++) {
+    var ff = f[i];
+    var noff = getMinMaxOffsets(ff);
+    if (noff.max > off.max) {
+      off.max = noff.max;
+    }
+    if (noff.min > off.min) {
+      off.min = noff.min;
+    }
+  }
+  return off;
+}
 
 var getMinMaxOffsets = function(f) {
   //f - fluff

@@ -78,7 +78,7 @@ var FluffFrame = function() {
   this.n.p = 0;
   this.n.pa = false; //absolute?
 
-  return this;
+  //return this;
 };
 
 module.exports = FluffFrame;
