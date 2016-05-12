@@ -25816,6 +25816,7 @@ var raw2psg = function (raw) {
         reg++;
       };
     } else {
+      ay[13] = ay[13] & 0x0f;
       for (var f = 0; f < PSG1_REGS; f++) {
         psg.push(reg);
         psg.push(ay[f]);
