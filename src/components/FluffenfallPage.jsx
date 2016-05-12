@@ -9,7 +9,6 @@ var FluffenfallPage = React.createClass({
       psg_uploaded: false,
       fluff_uploaded: false,
       button_enabled: false,
-      data_uri: ""
     };
   },
   onUpdatePSG: function(val) {
