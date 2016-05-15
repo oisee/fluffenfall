@@ -9,7 +9,8 @@ var psg2raw = function(psg) {
   var ay = new Uint8Array(RAW_REGS);
   var state = 'inidata';
   var r13_changed = false;
-  for (var i = 4; i < psg.length; i++) {
+  mainloop:
+  for (var i = 17; i < psg.length; i++) {
     var b = psg[i];
     switch (state) {
       case 'inidata':
@@ -23,7 +24,14 @@ var psg2raw = function(psg) {
             break;
           case 0xfd:
             state = 'eom';
-            break;
+            if (!r13_changed) {
+              //ay[13] = 0xff;
+              ay[13] = ay[13] & 0x0f | 0x80
+            }
+            for (var ii = 0; ii < ay.length; ii++) {
+              raw.push(ay[ii]);
+            }
+            break mainloop;
           case 0xfe:
             state = 'multieoi';
             r13_changed = false;

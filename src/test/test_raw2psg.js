@@ -11,11 +11,11 @@ var applyFluff = require("../lib/applyFluff.js");
 
 var infile = process.argv[2]||"";
 //var infile = "./0milli_for_arabic.psg";
-var outfile = process.argv[3]||infile + ".js.raw";
-var psg = rb(infile);
-var raw = psg2raw(psg);
+var outfile = process.argv[3]||infile + ".js.psg";
+var raw = rb(infile);
+var psg = raw2psg(raw);
 
-wb(outfile, raw);
+wb(outfile, psg);
 
 // var psg2 = raw2psg(raw);
 // wb(outfile+".2.psg", psg2);

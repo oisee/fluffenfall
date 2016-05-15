@@ -4,9 +4,8 @@ import sys
 import struct
 
 PSG1_ID = b'PSG\x1A'
-PSG1_HEAD = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00' 
 PSG1_REGS = 14
-RAW_REGS = 16
+RAW_REGS = 14
 
 class Raw:
     def __init__(self,filename):
@@ -22,13 +21,12 @@ class Raw:
 
     def convert_to_PSG1(self):
         ay = bytearray(16)
-        self.psg = self.psg + PSG1_ID + PSG1_HEAD
-        prevR13 = self.raw[13]; 
+        self.psg += PSG1_ID
+        #prevR13 = self.raw[13]; 
         for i in range(0,len(self.raw),RAW_REGS):
-            self.psg.append(0xff) #new frame
             ay = self.raw[i:i+PSG1_REGS]
             c_reg = 0
-            if ((ay[13] & 0x80) != 0 ) and (prevR13 & 0x0f == ay[13] & 0xf):
+            if ay[13] == 0xFF:
                 for r in ay[:13]:
                     self.psg.append(c_reg)
                     self.psg.append(r)
@@ -39,7 +37,8 @@ class Raw:
                     self.psg.append(c_reg)
                     self.psg.append(r)
                     c_reg += 1
-            prevR13 = ay[13]
+            #prevR13 = ay[13]
+            self.psg.append(0xff) #new frame
         self.psg.append(0xfd) #end of music
         return self.psg
 

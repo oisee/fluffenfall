@@ -12,7 +12,8 @@ var applyFluff = require("../lib/applyFluff.js");
 
 var infile = process.argv[2]||"";
 var ffile = process.argv[3]||"";
-var outfile = process.argv[4]||infile + ".fluffed.psg";
+//var outfile = infile + ".fluffed.psg";
+var outfile = process.argv[4]||infile + ".fluffed.raw";
 
 if (infile == "") {
   return;
@@ -22,8 +23,9 @@ if (ffile == "") {
 };
 //------------------------
 
-var psg = rb(infile);
-var raw = psg2raw(psg);
+//var psg = rb(infile);
+//var raw = psg2raw(psg);
+var raw = rb(infile);
 var frames = raw2chip(raw);
 
 //
@@ -38,5 +40,6 @@ var opt = {
 var newframes = applyFluff(frames, fluff, opt);
 
 var newraw = chip2raw(newframes);
-var newpsg = raw2psg(newraw);
-wb(outfile, newpsg);
+//var newpsg = raw2psg(newraw);
+//wb(outfile, newpsg);
+wb(outfile, newraw);

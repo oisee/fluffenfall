@@ -29,7 +29,7 @@ class Psg:
         ay = bytearray(RAW_REGS)
         state = 'inidata'
         r13_changed = False
-        for b in self.psg[4:]:
+        for b in self.psg[17:]:
             #print(format(b,'02x'))
             if state == 'inidata':
                 if b >= 0x00 and b <= 0x0d:
@@ -41,12 +41,17 @@ class Psg:
                     pass
                 elif b == 0xfd:
                     state = 'eom'
+                    if r13_changed == False:
+                        ay[13]= ay[13] & 0x0f | 0x80
+                    for r in ay:
+                        self.raw.append(r)
+                    break
                 elif b == 0xfe:
                     state = 'multieoi'
                     r13_changed = False
                 elif b == 0xff:
                     if r13_changed == False:
-                        ay[13]= 0xff
+                        ay[13]= ay[13] & 0x0f | 0x80
                     for r in ay:
                         self.raw.append(r)
                     state = 'inidata'
