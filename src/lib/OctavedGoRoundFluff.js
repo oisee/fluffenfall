@@ -12,7 +12,7 @@ var OctavedGoRoundFluff = function (speed) {
   swap[2] = new FluffFrame();
   swap[2].a.s = "b";
   swap[2].b.s = "c";
-  //swap[2].b.sh = -1;
+  swap[2].b.sh = -1;
   swap[2].c.s = "a";
   swap[2].c.sh = -1;
   
