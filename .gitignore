@@ -1,0 +1,10 @@
+node_modules
+dist
+static
+.tmp
+/app/vendor/
+.idea
+.DS_Store
+bower_components
+coverage
+.vscode
