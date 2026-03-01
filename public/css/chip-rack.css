@@ -1,0 +1,631 @@
+/* Chip Rack and Device Chain Styles */
+
+/* Chip Rack */
+.chip-rack {
+  padding: 10px;
+}
+
+.rack-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.rack-header h3 {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.add-chip-button {
+  padding: 5px 10px;
+  background: var(--accent-blue);
+  border: none;
+  color: white;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.add-chip-button:hover {
+  background: var(--accent-orange);
+}
+
+.chips-container {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+}
+
+/* Chip Module */
+.chip-module {
+  width: 150px;
+  background: linear-gradient(135deg, #3a3a3a, #2a2a2a);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.chip-module:hover {
+  border-color: var(--accent-blue);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,168,255,0.3);
+}
+
+.chip-module.selected {
+  border-color: var(--accent-green);
+  box-shadow: 0 0 20px rgba(0,255,136,0.3);
+}
+
+.chip-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.chip-type {
+  font-weight: bold;
+  color: var(--accent-orange);
+}
+
+.chip-power {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.chip-power.on {
+  color: var(--accent-green);
+  text-shadow: 0 0 5px currentColor;
+}
+
+.chip-display {
+  background: #000;
+  border: 1px solid #444;
+  border-radius: 3px;
+  padding: 5px;
+  margin-bottom: 8px;
+  font-family: 'Courier New', monospace;
+}
+
+.chip-name {
+  color: var(--accent-green);
+  font-size: 10px;
+}
+
+.chip-clock {
+  color: var(--text-secondary);
+  font-size: 9px;
+}
+
+.chip-visualizer {
+  margin-bottom: 8px;
+}
+
+.chip-scope {
+  width: 100%;
+  height: 40px;
+  background: #001100;
+  border: 1px solid #00ff00;
+  border-radius: 3px;
+}
+
+.chip-controls {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.chip-knob {
+  text-align: center;
+}
+
+.chip-knob input {
+  width: 30px;
+  height: 30px;
+}
+
+.chip-knob label {
+  display: block;
+  font-size: 8px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.chip-pan {
+  text-align: center;
+}
+
+.pan-grid {
+  width: 30px;
+  height: 30px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  position: relative;
+}
+
+.pan-dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: var(--accent-blue);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.chip-channels {
+  display: flex;
+  justify-content: space-around;
+}
+
+.channel-led {
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  background: var(--bg-dark);
+  color: var(--text-secondary);
+}
+
+.channel-led.active {
+  background: var(--accent-green);
+  color: black;
+  box-shadow: 0 0 5px var(--accent-green);
+}
+
+/* Add Chip Dialog */
+.add-chip-dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.dialog-content {
+  background: var(--bg-medium);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  padding: 20px;
+  width: 400px;
+  position: relative;
+}
+
+.dialog-content h3 {
+  margin-top: 0;
+  color: var(--text-primary);
+}
+
+.chip-presets {
+  margin-bottom: 20px;
+}
+
+.preset-option {
+  background: var(--bg-light);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  padding: 10px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.preset-option:hover {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+}
+
+.preset-name {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.preset-specs {
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+.custom-chip h4 {
+  margin-bottom: 10px;
+  color: var(--text-secondary);
+}
+
+.custom-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.chip-type-select,
+.clock-input {
+  flex: 1;
+  padding: 5px;
+  background: var(--bg-light);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 3px;
+}
+
+.add-custom {
+  padding: 5px 15px;
+  background: var(--accent-green);
+  border: none;
+  color: black;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.close-dialog {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* Device Chain */
+.device-chain {
+  padding: 10px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.chain-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.chain-header h3 {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.chain-controls {
+  display: flex;
+  gap: 5px;
+}
+
+.chain-controls button {
+  padding: 4px 8px;
+  background: var(--bg-light);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 10px;
+}
+
+.devices-container {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  overflow-x: auto;
+  padding: 10px 0;
+}
+
+.device-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.device-slot.input,
+.device-slot.output {
+  padding: 10px;
+  background: var(--bg-light);
+  border-radius: 3px;
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+.signal-flow {
+  color: var(--accent-blue);
+  font-size: 16px;
+  margin: 0 5px;
+}
+
+.device-slot.add {
+  width: 80px;
+  height: 100px;
+  border: 2px dashed var(--border-color);
+  border-radius: 5px;
+}
+
+.add-device {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.add-device:hover {
+  color: var(--accent-blue);
+  background: rgba(0,168,255,0.1);
+}
+
+/* Device */
+.device {
+  width: 120px;
+  background: var(--bg-light);
+  border: 2px solid var(--border-color);
+  border-radius: 5px;
+  cursor: move;
+  transition: all 0.2s;
+}
+
+.device:hover {
+  border-color: var(--accent-blue);
+}
+
+.device.selected {
+  border-color: var(--accent-orange);
+}
+
+.device.disabled {
+  opacity: 0.5;
+}
+
+.device-header {
+  display: flex;
+  align-items: center;
+  padding: 5px;
+  background: var(--bg-medium);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.device-toggle {
+  width: 16px;
+  height: 16px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+.device.enabled .device-toggle {
+  color: var(--accent-green);
+}
+
+.device-name {
+  flex: 1;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.device-menu {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.device-display {
+  padding: 10px;
+}
+
+/* Device UIs */
+.pattern-display {
+  margin-bottom: 10px;
+}
+
+.channel-route {
+  font-size: 10px;
+  padding: 2px;
+  background: var(--bg-dark);
+  margin-bottom: 2px;
+  border-radius: 2px;
+  text-align: center;
+}
+
+.device-param {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.device-param label {
+  font-size: 9px;
+  color: var(--text-secondary);
+}
+
+.device-param select,
+.device-param input {
+  flex: 1;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 2px;
+  border-radius: 2px;
+}
+
+.rhythm-display {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 10px;
+}
+
+.beat {
+  width: 10px;
+  height: 20px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-color);
+}
+
+.beat.active {
+  background: var(--accent-green);
+}
+
+.octave-display {
+  height: 40px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.octave-bar {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background: var(--accent-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: white;
+}
+
+/* Transport Bar */
+.transport-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 20px;
+}
+
+.transport-main {
+  display: flex;
+  gap: 5px;
+}
+
+.transport-button.record.active {
+  background: #ff0000;
+  color: white;
+}
+
+.transport-display {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex: 1;
+  justify-content: center;
+}
+
+.position-display {
+  background: var(--bg-dark);
+  padding: 5px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+}
+
+.position-label,
+.tempo-label,
+.signature-label {
+  font-size: 9px;
+  color: var(--text-secondary);
+  margin-bottom: 2px;
+}
+
+.position-value {
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  color: var(--accent-green);
+}
+
+.tempo-section,
+.signature-section {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.tempo-input {
+  width: 50px;
+  padding: 4px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 3px;
+  text-align: center;
+}
+
+.tap-tempo {
+  padding: 4px 8px;
+  background: var(--bg-light);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 10px;
+}
+
+.signature-select {
+  padding: 4px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 3px;
+}
+
+.transport-extras {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.metro-button,
+.quantize-button,
+.automation-button {
+  width: 30px;
+  height: 30px;
+  background: var(--bg-light);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.metro-button.active,
+.quantize-button.active,
+.automation-button.active {
+  background: var(--accent-blue);
+  color: white;
+}
+
+.cpu-display {
+  background: var(--bg-dark);
+  padding: 5px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  margin-left: 10px;
+}
+
+.cpu-label {
+  font-size: 9px;
+  color: var(--text-secondary);
+}
+
+.cpu-value {
+  font-size: 11px;
+  color: var(--accent-green);
+}

@@ -1,0 +1,640 @@
+/* DAW Layout Styles - Ableton/Bitwig Inspired */
+
+:root {
+  --bg-dark: #1e1e1e;
+  --bg-medium: #2d2d2d;
+  --bg-light: #3e3e3e;
+  --border-color: #484848;
+  --text-primary: #ffffff;
+  --text-secondary: #999999;
+  --accent-blue: #00a8ff;
+  --accent-orange: #ff6b00;
+  --accent-green: #00ff88;
+  --clip-playing: #00ff00;
+  --clip-queued: #ffff00;
+}
+
+/* Main Container */
+.daw-container {
+  width: 100%;
+  height: 100vh;
+  background: var(--bg-dark);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 11px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Transport Bar */
+.daw-header {
+  height: 60px;
+  background: var(--bg-medium);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.transport-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.transport-button {
+  width: 36px;
+  height: 36px;
+  background: var(--bg-light);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.transport-button:hover {
+  background: var(--accent-blue);
+}
+
+.transport-button.playing {
+  background: var(--accent-green);
+}
+
+.tempo-display {
+  margin-left: 20px;
+  padding: 5px 10px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+}
+
+/* Main Layout */
+.daw-main {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* Browser Panel */
+.daw-browser {
+  width: 200px;
+  background: var(--bg-medium);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+}
+
+.browser-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.browser-tabs .tab {
+  flex: 1;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  background: var(--bg-dark);
+  border-right: 1px solid var(--border-color);
+}
+
+.browser-tabs .tab.active {
+  background: var(--bg-medium);
+  color: var(--accent-blue);
+}
+
+.browser-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.browser-item {
+  padding: 8px;
+  margin-bottom: 4px;
+  background: var(--bg-light);
+  border-radius: 3px;
+  cursor: move;
+  transition: background 0.2s;
+}
+
+.browser-item:hover {
+  background: var(--accent-blue);
+}
+
+/* Center Area */
+.daw-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-dark);
+}
+
+.view-selector {
+  display: flex;
+  background: var(--bg-medium);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.view-selector button {
+  padding: 10px 20px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-right: 1px solid var(--border-color);
+}
+
+.view-selector button.active {
+  background: var(--bg-dark);
+  color: var(--text-primary);
+  border-bottom: 2px solid var(--accent-blue);
+}
+
+/* Session View */
+.session-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Clip Launcher */
+.clip-launcher {
+  flex: 1;
+  overflow: auto;
+  padding: 10px;
+}
+
+.clip-grid {
+  display: flex;
+  flex-direction: column;
+}
+
+.track-headers {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.corner-cell {
+  width: 100px;
+  min-width: 100px;
+}
+
+.track-header {
+  width: 100px;
+  margin-right: 8px;
+  padding: 8px;
+  background: var(--bg-medium);
+  border-radius: 3px;
+  text-align: center;
+}
+
+.track-name {
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.track-controls {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+}
+
+.track-controls button {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: var(--bg-light);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 9px;
+}
+
+.arm-button {
+  color: #ff0000;
+}
+
+.track-controls button:hover {
+  background: var(--accent-blue);
+}
+
+/* Scene Rows */
+.scenes-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.scene-row {
+  display: flex;
+  align-items: center;
+}
+
+.scene-header {
+  width: 100px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 8px;
+}
+
+.scene-launch {
+  width: 24px;
+  height: 24px;
+  background: var(--bg-light);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.scene-launch:hover {
+  background: var(--accent-green);
+}
+
+/* Clip Cells */
+.clip-cell {
+  width: 100px;
+  height: 60px;
+  margin-right: 8px;
+}
+
+.clip-slot {
+  width: 100%;
+  height: 100%;
+  border-radius: 3px;
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.clip-slot.empty {
+  background: var(--bg-light);
+  border: 1px dashed var(--border-color);
+}
+
+.clip-slot.empty:hover {
+  border-color: var(--accent-blue);
+}
+
+.clip-slot.playing {
+  animation: pulse 1s infinite;
+  border: 2px solid var(--clip-playing);
+}
+
+.clip-slot.selected {
+  border: 2px solid var(--accent-blue);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.clip-name {
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  padding: 4px;
+  text-align: center;
+}
+
+.clip-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(0,0,0,0.3);
+}
+
+.progress-bar {
+  height: 100%;
+  background: white;
+  animation: progress 2s linear infinite;
+}
+
+@keyframes progress {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+/* Stop Buttons */
+.stop-buttons {
+  display: flex;
+  margin-top: 10px;
+}
+
+.stop-button {
+  width: 100px;
+  height: 30px;
+  margin-right: 8px;
+  background: var(--bg-light);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.stop-button:hover {
+  background: #ff0000;
+}
+
+/* Mixer View */
+.mixer-view {
+  height: 300px;
+  background: var(--bg-medium);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+}
+
+.mixer-channels {
+  display: flex;
+  padding: 10px;
+  gap: 8px;
+  overflow-x: auto;
+  flex: 1;
+}
+
+.channel-strip {
+  width: 80px;
+  background: var(--bg-light);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.channel-strip.master {
+  width: 120px;
+  background: var(--bg-dark);
+  border: 2px solid var(--accent-orange);
+}
+
+.channel-header {
+  text-align: center;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.channel-name {
+  font-weight: bold;
+  font-size: 10px;
+}
+
+.chip-indicator {
+  font-size: 9px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* EQ Section */
+.eq-section {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 10px;
+}
+
+.eq-knob {
+  text-align: center;
+}
+
+.eq-knob input {
+  width: 20px;
+  height: 20px;
+}
+
+.eq-knob label {
+  font-size: 8px;
+  color: var(--text-secondary);
+}
+
+/* Sends Section */
+.sends-section {
+  font-size: 9px;
+  margin-bottom: 10px;
+  color: var(--text-secondary);
+}
+
+.send {
+  margin-bottom: 2px;
+}
+
+/* Pan Control */
+.pan-control {
+  margin-bottom: 10px;
+}
+
+.pan-slider {
+  width: 100%;
+}
+
+.pan-display {
+  height: 4px;
+  background: var(--bg-dark);
+  position: relative;
+  margin-top: 4px;
+}
+
+.pan-indicator {
+  position: absolute;
+  width: 2px;
+  height: 100%;
+  background: var(--accent-blue);
+}
+
+/* Volume Section */
+.volume-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  position: relative;
+}
+
+.meter {
+  width: 20px;
+  height: 100px;
+  background: var(--bg-dark);
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.meter-bar {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background: linear-gradient(to top,
+    #00ff00 0%,
+    #ffff00 70%,
+    #ff0000 100%);
+}
+
+.master-meter {
+  width: 40px;
+  display: flex;
+}
+
+.meter-bar-left,
+.meter-bar-right {
+  width: 50%;
+  background: linear-gradient(to top,
+    #00ff00 0%,
+    #ffff00 70%,
+    #ff0000 100%);
+  position: absolute;
+  bottom: 0;
+}
+
+.meter-bar-right {
+  right: 0;
+}
+
+.db-scale {
+  position: absolute;
+  right: -25px;
+  top: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-size: 7px;
+  color: var(--text-secondary);
+}
+
+.volume-fader {
+  width: 30px;
+  height: 80px;
+  -webkit-appearance: slider-vertical;
+  background: var(--bg-dark);
+}
+
+.db-display {
+  font-size: 9px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+/* Channel Buttons */
+.channel-buttons {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+}
+
+.channel-buttons button {
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-dark);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 9px;
+}
+
+.mute-button.active {
+  background: #ff6600;
+  color: white;
+}
+
+.solo-button.active {
+  background: #ffff00;
+  color: black;
+}
+
+.record-button {
+  color: #ff0000;
+}
+
+/* Device View */
+.device-view {
+  height: 200px;
+  background: var(--bg-medium);
+  border-top: 1px solid var(--border-color);
+  padding: 10px;
+  overflow-x: auto;
+}
+
+/* Inspector Panel */
+.daw-inspector {
+  width: 200px;
+  background: var(--bg-medium);
+  border-left: 1px solid var(--border-color);
+  padding: 15px;
+}
+
+.daw-inspector h3 {
+  margin-bottom: 15px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.clip-info .property {
+  margin-bottom: 10px;
+}
+
+.clip-info label {
+  display: block;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+  font-size: 10px;
+}
+
+.clip-info input[type="text"],
+.clip-info input[type="number"] {
+  width: 100%;
+  padding: 4px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 3px;
+}
+
+.clip-info input[type="checkbox"] {
+  margin-right: 5px;
+}
+
+/* Mixer Footer */
+.mixer-footer {
+  height: 30px;
+  background: var(--bg-dark);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+}
+
+.cpu-meter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.meter-horizontal {
+  width: 100px;
+  height: 8px;
+  background: var(--bg-light);
+  border: 1px solid var(--border-color);
+  border-radius: 2px;
+}
+
+.meter-fill {
+  height: 100%;
+  background: var(--accent-green);
+  border-radius: 2px;
+}

@@ -15,6 +15,7 @@ var Base = require('./components/Base.jsx');
 var FluffenfallPage = require('./components/FluffenfallPage.jsx');
 var EffectronPage = require('./components/EffectronPage.jsx');
 var AboutPage = require('./components/AboutPage.jsx');
+var DAWLayout = require('./components/DAW/DAWLayout.jsx');
 
 var Routes = (
   <Router history={appHistory}>
@@ -22,6 +23,7 @@ var Routes = (
       <IndexRedirect to="/fluffenfall" />
       <Route path="/fluffenfall" component={FluffenfallPage}></Route>
       <Route path="/effectron" component={EffectronPage}></Route>
+      <Route path="/daw" component={DAWLayout}></Route>
       <Route path="/about" component={AboutPage}></Route>
     </Route>
   </Router>
